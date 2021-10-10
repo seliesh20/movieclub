@@ -40,3 +40,8 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+
+/app/symfony.lock
+/app/yarn.lock
+/app/composer.lock
