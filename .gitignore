@@ -1,7 +1,7 @@
 # docker
-/docker/logs/nginx
-/docker/logs/mysql
-/docker/mysql/data
+/docker/logs/nginx/*
+/docker/logs/mysql/*
+/docker/mysql/data/*
 /docker/variables.env
 
 # Cache, session files and logs (Symfony3)
