@@ -45,3 +45,4 @@
 /app/symfony.lock
 /app/yarn.lock
 /app/composer.lock
+/app/.env
