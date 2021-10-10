@@ -1,7 +1,10 @@
 # docker
 /docker/logs/nginx/*
+!/docker/logs/nginx/.gitignore
 /docker/logs/mysql/*
+!/docker/logs/mysql/.gitignore
 /docker/mysql/data/*
+!/docker/mysql/data/.gitignore
 /docker/variables.env
 
 # Cache, session files and logs (Symfony3)
