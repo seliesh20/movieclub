@@ -23,10 +23,35 @@ class Register extends Component{
         //validate        
         Object.keys(this.state).forEach((key) => {
             let value = this.state[key].trim();
+            let className = document.getElementsByName(key)[0].className;
+            className = className.replace('is-valid', '').replace('is-invalid', '');
+            let doc = document.getElementsByName(key)[0].nextElementSibling;
+            doc.innerHTML = ""; 
+            let docParentClassName = doc.parentElement.className;
+            docParentClassName = docParentClassName.replace('has-error', '');
             if(value == "" || value.length == 0){
-                is_valid = false;
-            }            
+                document.getElementsByName(key)[0].className = className+' is-invalid';                
+                doc.className = "invalid-feedback";
+                doc.innerHTML = "Invalid "+key.toUpperCase(); 
+                doc.parentElement.className += " has-error";
+                is_valid=false;
+            }          
         });
+
+        let className = document.getElementsByName('repeatpassword')[0].className;
+        className = className.replace('is-valid', '').replace('is-invalid', '');
+        let doc = document.getElementsByName('repeatpassword')[0].nextElementSibling;
+        doc.innerHTML = ""; 
+        let docParentClassName = doc.parentElement.className;
+        docParentClassName = docParentClassName.replace('has-error', '');
+        if(this.state.password != this.state.repeatpassword){
+            document.getElementsByName('repeatpassword')[0].className = className+' is-invalid';            
+                doc.className = "invalid-feedback";
+                doc.innerHTML = "Invalid "+key.toUpperCase(); 
+                doc.parentElement.className += " has-error";
+                is_valid=false;
+        }
+
         //save
         if(is_valid){
             axios.post(Config.BASE_URL + '/api/register', this.state).then((response) => {
@@ -36,10 +61,15 @@ class Register extends Component{
                     console.log(response.data.errors);
                 }
             });
+        } else {
+            document.getElementsByTagName('form')[0].className += " was-validated";
+
         }
     }
 
-    onInputChange(event){        
+    onInputChange(event){     
+        //validate
+        
         this.setState({
             [event.target.name] :event.target.value
         })
@@ -50,7 +80,7 @@ class Register extends Component{
             <div>
                 <h3>User Registration</h3>
                 <div className="d-flex justify-content-center col-12">
-                    <form className="col-md-5 col-lg-3 col-sm-8" onSubmit={this.handleSubmit}>
+                    <form className="col-md-5 col-lg-3 col-sm-8 needs-validation" onSubmit={this.handleSubmit} noValidate>
                         <div className="form-group">
                             <label>Name</label>
                             <input 
@@ -59,7 +89,9 @@ class Register extends Component{
                                 className="form-control" 
                                 maxLength="20"
                                 defaultValue={this.state.name} 
-                                onChange={this.onInputChange}/>
+                                onChange={this.onInputChange}
+                                />
+                                <div></div>
                         </div>
                         <div className="form-group">
                             <label>Email</label>
@@ -69,7 +101,9 @@ class Register extends Component{
                                 className="form-control" 
                                 maxLength="20"
                                 onChange={this.onInputChange}
-                                defaultValue={this.state.email}/>
+                                defaultValue={this.state.email}
+                                />
+                                <div></div>
                         </div>
                         <div className="form-group">
                             <label>Password</label>
@@ -79,7 +113,9 @@ class Register extends Component{
                                 className="form-control" 
                                 maxLength="20"
                                 onChange={this.onInputChange}
-                                defaultValue={this.state.password}/>
+                                defaultValue={this.state.password}
+                                />
+                                <div></div>
                         </div>
                         <div className="form-group">
                             <label>Repeat Password</label>
@@ -89,7 +125,9 @@ class Register extends Component{
                                 className="form-control" 
                                 maxLength="20"
                                 onChange={this.onInputChange}
-                                defaultValue=""/>
+                                defaultValue=""
+                                />
+                                <div></div>
                         </div>
                         <div className="form-group">
                             <input type="submit" className="btn btn-success" value="Register"/>
