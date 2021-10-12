@@ -1,8 +1,16 @@
 import React, {Component} from "react";
 import {Route, Switch,Redirect, Link, withRouter} from 'react-router-dom';
+import { Config, Alerts } from "../config/Config";
 import Register from "./Register";
 
+
 class Home extends Component{
+    constructor(){
+        super(); 
+        this.state = {
+            alert:{}
+        }       
+    }     
     render() {
         return (
            <div>
@@ -19,6 +27,9 @@ class Home extends Component{
                    &nbsp;&nbsp;
                    <Link className={"btn btn-primary"} to={"/login"}> Login </Link>
                </nav>
+               <div id="alertbox">
+                    
+               </div>
                <Switch>            
                    <Route path="/register" component={Register} />                   
                </Switch>

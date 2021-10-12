@@ -1,11 +1,12 @@
 import React, {Component} from "react";
 import axios from 'axios';
-import {Config} from '../config/Config';
+import {Config, Alerts} from '../config/Config';
 
 class Register extends Component{
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
+        console.log(props)
         this.state = {
             name:"",
             email:"",
@@ -21,28 +22,40 @@ class Register extends Component{
         this.onInputChange = this.onInputChange.bind(this);
     }
 
-    handleSubmit(event) {
+    handleSubmit = async(event) => {
         event.preventDefault();        
+        //loading 
+
         //save
         if(this.state.is_valid()){
-            axios.post(Config.BASE_URL + '/api/register', {
-                name:this.state.name,
-                email:this.state.email,
-                name:this.state.password,
-            }).then((response) => {
-                if(response.status == 'success'){
+            document.querySelector('.overlay').className = 'overlay';
+            var bodyFormData = new FormData();
+            bodyFormData.append('name', this.state.name);
+            bodyFormData.append('email', this.state.email);
+            bodyFormData.append('password', this.state.password);
+            try{
+                const response = await axios({
+                    method:"post",
+                    url: Config.BASE_URL + '/api/register',
+                    data: bodyFormData,
+                    headers:{'Content-Type':"multipart/form-data"}
+                });
+                if(response.status == 200){
+                    if(response.data.status == 'success'){
 
-                } else {
-                    console.log(response.data.errors);
+                    } else {
+                        console.log(response.data.data.errors);
+                    }
+
+                    document.querySelector('.overlay').className = 'overlay hide';
                 }
-            });
-        } else {
-            //document.getElementsByTagName('form')[0].className += "";
+            } catch( error){
 
+            }            
         }
     }
 
-    onInputChange(event){     
+    onInputChange(event){        
         //validate
         let value = event.target.value.trim();
         let is_valid = true;
@@ -85,13 +98,13 @@ class Register extends Component{
             document.querySelector('input[type=submit]').removeAttribute('disabled');
         } else {
             document.querySelector('input[type=submit]').className = submitClassNames + ' disabled';
-            document.querySelector('input[type=submit]').setAttribute('disabled');
+            document.querySelector('input[type=submit]').setAttribute('disabled', true);
         }
     }
 
     render(){
         return(
-            <div>
+            <div id="user-reg" className="box">
                 <h3>User Registration</h3>
                 <div className="d-flex justify-content-center col-12">
                     <form className="col-md-5 col-lg-3 col-sm-8" onSubmit={this.handleSubmit} noValidate>
@@ -147,6 +160,9 @@ class Register extends Component{
                             <input type="submit" className="btn btn-success disabled" value="Register" disabled/>
                         </div>
                     </form>
+                </div>
+                <div className="overlay hide">
+                    <i className="fa fa-refresh fa-spin"></i>
                 </div>
             </div>
         )
