@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import axios from 'axios';
 import {Config, Alerts} from '../config/Config';
+import {Message} from 'semantic-ui-react'
 
 class Register extends Component{
 
@@ -16,16 +17,31 @@ class Register extends Component{
                     && this.email.length
                     && this.password.length
                     && this.password == document.querySelector('input[type=password][name=repeatpassword]').value);
-            }
+            },
+            formSuccess:false
+
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
     }
-
+    showError(input, message){
+        let value = input.value.trim();        
+        let message_div = input.nextElementSibling;
+        input.className += " is-invalid";
+        message_div.className = "invalid-feedback";
+        message_div.innerHTML = message;
+    }
+    hideError(input){
+        let value = input.value.trim();        
+        let message_div = input.nextElementSibling;
+        input.className = input.className.replace('is-invalid', ' ').trim();
+        message_div.className = "";
+        message_div.innerHTML = "";    
+    }
     handleSubmit = async(event) => {
         event.preventDefault();        
         //loading 
-
+        let th = this;
         //save
         if(this.state.is_valid()){
             document.querySelector('.overlay').className = 'overlay';
@@ -41,16 +57,24 @@ class Register extends Component{
                     headers:{'Content-Type':"multipart/form-data"}
                 });
                 if(response.status == 200){
-                    if(response.data.status == 'success'){
-
+                    console.log(response.data.status === "success"); 
+                    if(response.data.status === "success"){
+                        console.log(this.state);
+                        //show success message                        
+                        this.setState({
+                            formSuccess:true
+                        });   
+                        console.log(this.state);
+                        //this.render();
                     } else {
-                        console.log(response.data.data.errors);
+                        Object.keys(response.data.result.errors).forEach(function(key, i){
+                            th.showError(document.querySelector('input[name='+key+']'), response.data.result.errors[key].join('<br/>'));                            
+                        });
                     }
-
                     document.querySelector('.overlay').className = 'overlay hide';
                 }
             } catch( error){
-
+                //show error
             }            
         }
     }
@@ -59,30 +83,21 @@ class Register extends Component{
         //validate
         let value = event.target.value.trim();
         let is_valid = true;
-        let message_div = event.target.nextElementSibling;
-        event.target.className = event.target.className.replace('is-invalid', ' ').trim();
-        message_div.className = "";
-        message_div.innerHTML = "";
+        this.hideError(event.target);
         if(value == "" || value.length == 0){
-            event.target.className = event.target.className + ' is-invalid';
-            message_div.className = "invalid-feedback";
-            message_div.innerHTML = event.target.name.capitalize()+" cannot be empty!!";
+            this.showError(event.target, event.target.name.capitalize()+" cannot be empty!!");
             is_valid = false;
         }        
         //Email Validator
         if(event.target.name == 'email'){
             if(!Config.EMAIL_REGREX.test(value)){
-                event.target.className = event.target.className + ' is-invalid';
-                message_div.className = "invalid-feedback";
-                message_div.innerHTML = "Email entered is invalid";
+                this.showError(event.target, "Email entered is invalid!!");
                 is_valid = false;
             }
         }
         if(event.target.name == 'repeatpassword'
             && event.target.value != this.state.password){
-                event.target.className = event.target.className + ' is-invalid';
-                message_div.className = "invalid-feedback";
-                message_div.innerHTML = "Password does not match";
+                this.showError(event.target, "Password does not match");                
                 is_valid = false;
         }
         if(is_valid && event.target.name != 'repeatpassword'){
@@ -105,6 +120,9 @@ class Register extends Component{
     render(){
         return(
             <div id="user-reg" className="box">
+                {this.state.formSuccess?(
+                <Alerts/>                
+                ):(<br/>)}
                 <h3>User Registration</h3>
                 <div className="d-flex justify-content-center col-12">
                     <form className="col-md-5 col-lg-3 col-sm-8" onSubmit={this.handleSubmit} noValidate>

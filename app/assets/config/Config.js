@@ -10,7 +10,7 @@ export const Config = {
     EMAIL_REGREX:/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/,
 }
 
-const Alerts = function (props) {
+export const Alerts = function (props) {
     return (
         <div className={"alert alert-"}>
             Test Message

@@ -35,11 +35,11 @@ class UserController extends AbstractController
             foreach($errors as $error){
                 $message[$error->getPropertyPath()][] = $error->getMessage();
             }   
-            return new JsonResponse(['status'=>'failure', 'data'=>['errors' => $message]]);
+            return new JsonResponse(['status'=>'failure', 'result'=>['errors' => $message]]);
         }
         
         //save
         $userRepository->save($user);
-        return new JsonResponse(['status'=>'success', 'data'=>['email'=>$email]]);
+        return new JsonResponse(['status'=>'success', 'result'=>['email'=>$email]]);
     }
 }
