@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import axios from 'axios';
-import { objectOf } from "prop-types";
-import {Config} from './Config';
+import {Config} from '../config/Config';
 
 class Register extends Component{
 
@@ -10,51 +9,27 @@ class Register extends Component{
         this.state = {
             name:"",
             email:"",
-            password:"",
-            repeatpassword:""
+            password:"",            
+            is_valid(){                
+                return (this.name.length 
+                    && this.email.length
+                    && this.password.length
+                    && this.password == document.querySelector('input[type=password][name=repeatpassword]').value);
+            }
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
     }
 
     handleSubmit(event) {
-        event.preventDefault();
-        let is_valid = true;
-        //validate        
-        Object.keys(this.state).forEach((key) => {
-            let value = this.state[key].trim();
-            let className = document.getElementsByName(key)[0].className;
-            className = className.replace('is-valid', '').replace('is-invalid', '');
-            let doc = document.getElementsByName(key)[0].nextElementSibling;
-            doc.innerHTML = ""; 
-            let docParentClassName = doc.parentElement.className;
-            docParentClassName = docParentClassName.replace('has-error', '');
-            if(value == "" || value.length == 0){
-                document.getElementsByName(key)[0].className = className+' is-invalid';                
-                doc.className = "invalid-feedback";
-                doc.innerHTML = "Invalid "+key.toUpperCase(); 
-                doc.parentElement.className += " has-error";
-                is_valid=false;
-            }          
-        });
-
-        let className = document.getElementsByName('repeatpassword')[0].className;
-        className = className.replace('is-valid', '').replace('is-invalid', '');
-        let doc = document.getElementsByName('repeatpassword')[0].nextElementSibling;
-        doc.innerHTML = ""; 
-        let docParentClassName = doc.parentElement.className;
-        docParentClassName = docParentClassName.replace('has-error', '');
-        if(this.state.password != this.state.repeatpassword){
-            document.getElementsByName('repeatpassword')[0].className = className+' is-invalid';            
-                doc.className = "invalid-feedback";
-                doc.innerHTML = "Invalid "+key.toUpperCase(); 
-                doc.parentElement.className += " has-error";
-                is_valid=false;
-        }
-
+        event.preventDefault();        
         //save
-        if(is_valid){
-            axios.post(Config.BASE_URL + '/api/register', this.state).then((response) => {
+        if(this.state.is_valid()){
+            axios.post(Config.BASE_URL + '/api/register', {
+                name:this.state.name,
+                email:this.state.email,
+                name:this.state.password,
+            }).then((response) => {
                 if(response.status == 'success'){
 
                 } else {
@@ -62,17 +37,56 @@ class Register extends Component{
                 }
             });
         } else {
-            document.getElementsByTagName('form')[0].className += " was-validated";
+            //document.getElementsByTagName('form')[0].className += "";
 
         }
     }
 
     onInputChange(event){     
         //validate
-        
-        this.setState({
-            [event.target.name] :event.target.value
-        })
+        let value = event.target.value.trim();
+        let is_valid = true;
+        let message_div = event.target.nextElementSibling;
+        event.target.className = event.target.className.replace('is-invalid', ' ').trim();
+        message_div.className = "";
+        message_div.innerHTML = "";
+        if(value == "" || value.length == 0){
+            event.target.className = event.target.className + ' is-invalid';
+            message_div.className = "invalid-feedback";
+            message_div.innerHTML = event.target.name.capitalize()+" cannot be empty!!";
+            is_valid = false;
+        }        
+        //Email Validator
+        if(event.target.name == 'email'){
+            if(!Config.EMAIL_REGREX.test(value)){
+                event.target.className = event.target.className + ' is-invalid';
+                message_div.className = "invalid-feedback";
+                message_div.innerHTML = "Email entered is invalid";
+                is_valid = false;
+            }
+        }
+        if(event.target.name == 'repeatpassword'
+            && event.target.value != this.state.password){
+                event.target.className = event.target.className + ' is-invalid';
+                message_div.className = "invalid-feedback";
+                message_div.innerHTML = "Password does not match";
+                is_valid = false;
+        }
+        if(is_valid && event.target.name != 'repeatpassword'){
+            this.setState({
+                [event.target.name] :event.target.value
+            })
+        } 
+        let submitClassNames = document.querySelector('input[type=submit]').className;
+        submitClassNames = submitClassNames.replaceAll('disabled', ' ').trim();
+        submitClassNames = submitClassNames.split(' ').filter((x, i, a) => a.indexOf(x) ==i).join(" ");
+        if(this.state.is_valid()){            
+            document.querySelector('input[type=submit]').className = submitClassNames;
+            document.querySelector('input[type=submit]').removeAttribute('disabled');
+        } else {
+            document.querySelector('input[type=submit]').className = submitClassNames + ' disabled';
+            document.querySelector('input[type=submit]').setAttribute('disabled');
+        }
     }
 
     render(){
@@ -80,7 +94,7 @@ class Register extends Component{
             <div>
                 <h3>User Registration</h3>
                 <div className="d-flex justify-content-center col-12">
-                    <form className="col-md-5 col-lg-3 col-sm-8 needs-validation" onSubmit={this.handleSubmit} noValidate>
+                    <form className="col-md-5 col-lg-3 col-sm-8" onSubmit={this.handleSubmit} noValidate>
                         <div className="form-group">
                             <label>Name</label>
                             <input 
@@ -130,7 +144,7 @@ class Register extends Component{
                                 <div></div>
                         </div>
                         <div className="form-group">
-                            <input type="submit" className="btn btn-success" value="Register"/>
+                            <input type="submit" className="btn btn-success disabled" value="Register" disabled/>
                         </div>
                     </form>
                 </div>
