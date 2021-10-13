@@ -10,10 +10,26 @@ export const Config = {
     EMAIL_REGREX:/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/,
 }
 
-export const Alerts = function (props) {
-    return (
-        <div className={"alert alert-"}>
-            Test Message
-        </div>
-    )
+class Alerts extends Component{     
+    constructor(props){
+        super(props);
+        this.state = {
+            display:true
+        };
+        this.hideMessage = this.hideMessage.bind(this);
+    }
+    hideMessage(){
+        this.setState({display:false});
+    }
+    render(){
+        return this.state.display?(
+            <div className={"alert alert-"+this.props.type}>
+                {this.props.message}
+                <button type="button" className="close" onClick={this.hideMessage} data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        ):null
+    }       
 }
+export default Alerts;

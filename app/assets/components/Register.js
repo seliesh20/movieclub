@@ -1,13 +1,12 @@
 import React, {Component} from "react";
 import axios from 'axios';
 import {Config, Alerts} from '../config/Config';
-import {Message} from 'semantic-ui-react'
+import { Link } from "react-router-dom";
 
 class Register extends Component{
 
     constructor(props){
         super(props);
-        console.log(props)
         this.state = {
             name:"",
             email:"",
@@ -16,10 +15,9 @@ class Register extends Component{
                 return (this.name.length 
                     && this.email.length
                     && this.password.length
-                    && this.password == document.querySelector('input[type=password][name=repeatpassword]').value);
-            },
-            formSuccess:false
-
+                    && document.querySelector('input[type=password][name=password]').value 
+                        == document.querySelector('input[type=password][name=repeatpassword]').value);
+            }
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
@@ -58,14 +56,17 @@ class Register extends Component{
                 });
                 if(response.status == 200){
                     console.log(response.data.status === "success"); 
-                    if(response.data.status === "success"){
-                        console.log(this.state);
-                        //show success message                        
-                        this.setState({
-                            formSuccess:true
-                        });   
-                        console.log(this.state);
-                        //this.render();
+                    if(response.data.status === "success"){                        
+                        //show success message        
+                        var link = <Link to="/login">Login</Link>;
+                        var username = <strong>{this.state.name}</strong>;
+                        th.props.setAlert({
+                            0:{
+                                type:"success",
+                                message:<span>The user {username} is registered successfully!! Please {link} here!!'</span>
+                            }
+                        });
+                        //window.location.href = Config.BASE_URL + '/login';
                     } else {
                         Object.keys(response.data.result.errors).forEach(function(key, i){
                             th.showError(document.querySelector('input[name='+key+']'), response.data.result.errors[key].join('<br/>'));                            
@@ -75,6 +76,12 @@ class Register extends Component{
                 }
             } catch( error){
                 //show error
+                th.props.setAlert({
+                    0:{
+                        type:"danger",
+                        message:"An internal error occured!!"                            
+                    }
+                });
             }            
         }
     }
@@ -119,10 +126,7 @@ class Register extends Component{
 
     render(){
         return(
-            <div id="user-reg" className="box">
-                {this.state.formSuccess?(
-                <Alerts/>                
-                ):(<br/>)}
+            <div id="user-reg" className="box">                
                 <h3>User Registration</h3>
                 <div className="d-flex justify-content-center col-12">
                     <form className="col-md-5 col-lg-3 col-sm-8" onSubmit={this.handleSubmit} noValidate>
