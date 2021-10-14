@@ -54,19 +54,17 @@ class Register extends Component{
                     data: bodyFormData,
                     headers:{'Content-Type':"multipart/form-data"}
                 });
-                if(response.status == 200){
-                    console.log(response.data.status === "success"); 
-                    if(response.data.status === "success"){                        
-                        //show success message        
-                        var link = <Link to="/login">Login</Link>;
+                if(response.status == 200){                    
+                    if(response.data.status === "success"){
+                        //show success message                                
                         var username = <strong>{this.state.name}</strong>;
                         th.props.setAlert({
                             0:{
                                 type:"success",
-                                message:<span>The user {username} is registered successfully!! Please {link} here!!'</span>
+                                message:<span>The user {username} is registered successfully!!</span>
                             }
                         });
-                        //window.location.href = Config.BASE_URL + '/login';
+                        window.location.href = Config.BASE_URL + '/login';
                     } else {
                         Object.keys(response.data.result.errors).forEach(function(key, i){
                             th.showError(document.querySelector('input[name='+key+']'), response.data.result.errors[key].join('<br/>'));                            

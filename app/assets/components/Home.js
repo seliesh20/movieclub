@@ -4,6 +4,7 @@ import Alerts, { Config} from "../config/Config";
 import { v4 as uuidv4 } from 'uuid';
 import Register from "./Register";
 import Login from "./Login";
+import Dashboard from "./Dashboard";
 
 class Home extends Component{
     constructor(){
@@ -46,7 +47,10 @@ class Home extends Component{
                     </Route>
                     <Route path="/login">
                         <Login  setAlert={this.setAlert}/>
-                    </Route>                   
+                    </Route>
+                    <Route path="/dashboard">
+                        <Dashboard  setAlert={this.setAlert}/>
+                    </Route>
                </Switch>
            </div>
         )

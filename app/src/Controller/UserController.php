@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 
 use App\Entity\User;
@@ -18,7 +19,10 @@ use App\Repository\UserRepository;
 class UserController extends AbstractController
 {
     #[Route('/api/register', name: 'user_register', methods:["post"])]
-    public function index(Request $request, UserRepository $userRepository, ValidatorInterface $validator): Response
+    public function index(Request $request, 
+        UserRepository $userRepository, 
+        ValidatorInterface $validator,
+        UserPasswordHasherInterface $userPasswordHasherInterface): Response        
     {
         $name = trim($request->get('name'));
         $email = trim($request->get('email'));
@@ -27,7 +31,13 @@ class UserController extends AbstractController
         $user = new User();
         $user->setName($name);
         $user->setEmail($email);
-        $user->setPassword($password);
+        
+        $hashedPassword = $userPasswordHasherInterface->hashPassword(
+            $user,
+            $password
+        );
+        $user->setPassword($hashedPassword);
+        $user->setRoles(['ROLE_USER']);
 
         $errors = $validator->validate($user);
         if(count($errors)){
