@@ -64,7 +64,7 @@ class Register extends Component{
                                 message:<span>The user {username} is registered successfully!!</span>
                             }
                         });
-                        window.location.href = Config.BASE_URL + '/login';
+                        window.location = Config.BASE_URL + '/login';
                     } else {
                         Object.keys(response.data.result.errors).forEach(function(key, i){
                             th.showError(document.querySelector('input[name='+key+']'), response.data.result.errors[key].join('<br/>'));                            
