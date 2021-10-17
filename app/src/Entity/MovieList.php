@@ -2,25 +2,24 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MovieListRepository;
-use App\Annotation\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
 
-
-/** 
+/**
  * @ORM\Entity(repositoryClass=MovieListRepository::class)
  * @Serializer\ExclusionPolicy("all")
  * @Hateoas\Relation(
  *      "self",
  *      href=@Hateoas\Route(
- *          "api_movie_show",
- *          parameters={"movie_title" = "expr(object.getMovieTitle())"}
+ *          "expr('api/movies/' ~ object.getId())"
  *      )
  * )
  */
+#[ApiResource]
 class MovieList
 {
     /**
@@ -33,17 +32,7 @@ class MovieList
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $movie_title;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $imdb_id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $image_url;
+    private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -51,10 +40,20 @@ class MovieList
     private $description;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $image_url;
+
+    /**
+     * @ORM\Column(type="string", length=15)
+     */
+    private $imdb_id;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="movieLists")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user_id;
+    private $user;
 
     /**
      * @ORM\Column(type="datetime")
@@ -66,38 +65,14 @@ class MovieList
         return $this->id;
     }
 
-    public function getMovieTitle(): ?string
+    public function getTitle(): ?string
     {
-        return $this->movie_title;
+        return $this->title;
     }
 
-    public function setMovieTitle(string $movie_title): self
+    public function setTitle(string $title): self
     {
-        $this->movie_title = $movie_title;
-
-        return $this;
-    }
-
-    public function getImdbId(): ?string
-    {
-        return $this->imdb_id;
-    }
-
-    public function setImdbId(string $imdb_id): self
-    {
-        $this->imdb_id = $imdb_id;
-
-        return $this;
-    }
-
-    public function getImageUrl(): ?string
-    {
-        return $this->image_url;
-    }
-
-    public function setImageUrl(string $image_url): self
-    {
-        $this->image_url = $image_url;
+        $this->title = $title;
 
         return $this;
     }
@@ -114,14 +89,38 @@ class MovieList
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getImageUrl(): ?string
     {
-        return $this->user_id;
+        return $this->image_url;
     }
 
-    public function setUserId(?User $user_id): self
+    public function setImageUrl(string $image_url): self
     {
-        $this->user_id = $user_id;
+        $this->image_url = $image_url;
+
+        return $this;
+    }
+
+    public function getImdbId(): ?string
+    {
+        return $this->imdb_id;
+    }
+
+    public function setImdbId(string $imdb_id): self
+    {
+        $this->imdb_id = $imdb_id;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

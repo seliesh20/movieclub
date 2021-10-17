@@ -29,7 +29,7 @@ class Home extends Component{
                    <div className="collapse navbar-collapse" id="navbarText">
                        <ul className="navbar-nav mr-auto">
                            <li className="nav-item">
-                               <Link className={"nav-link"} to={"/movielist"}> Movies </Link>
+                               <Link className={"nav-link"} to={"/movielists"}> Movies </Link>
                            </li>                           
                        </ul>                       
                    </div>
@@ -54,7 +54,7 @@ class Home extends Component{
                     <Route path="/dashboard">
                         <Dashboard setAlert={this.setAlert}/>
                     </Route>
-                    <Route path="/movielist">
+                    <Route path="/movielists">
                         <Movielist setAlert={this.setAlert}/>
                     </Route>
                </Switch>

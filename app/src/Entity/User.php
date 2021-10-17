@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=MovieList::class, mappedBy="user_id")
+     * @ORM\OneToMany(targetEntity=MovieList::class, mappedBy="user")
      */
     private $movieLists;
 
@@ -174,7 +174,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->movieLists->contains($movieList)) {
             $this->movieLists[] = $movieList;
-            $movieList->setUserId($this);
+            $movieList->setUser($this);
         }
 
         return $this;
@@ -184,12 +184,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->movieLists->removeElement($movieList)) {
             // set the owning side to null (unless already changed)
-            if ($movieList->getUserId() === $this) {
-                $movieList->setUserId(null);
+            if ($movieList->getUser() === $this) {
+                $movieList->setUser(null);
             }
         }
 
         return $this;
     }
-
+    
 }
