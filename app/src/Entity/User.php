@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -49,6 +51,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Assert\NotBlank     
      */
     private $name;
+
+    /**
+     * @ORM\OneToMany(targetEntity=MovieList::class, mappedBy="user_id")
+     */
+    private $movieLists;
+
+    public function __construct()
+    {
+        $this->movieLists = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -147,6 +159,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return Collection|MovieList[]
+     */
+    public function getMovieLists(): Collection
+    {
+        return $this->movieLists;
+    }
+
+    public function addMovieList(MovieList $movieList): self
+    {
+        if (!$this->movieLists->contains($movieList)) {
+            $this->movieLists[] = $movieList;
+            $movieList->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovieList(MovieList $movieList): self
+    {
+        if ($this->movieLists->removeElement($movieList)) {
+            // set the owning side to null (unless already changed)
+            if ($movieList->getUserId() === $this) {
+                $movieList->setUserId(null);
+            }
+        }
+
         return $this;
     }
 

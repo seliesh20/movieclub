@@ -2,9 +2,12 @@ import React, {Component} from "react";
 import {Route, Switch,Redirect, Link, withRouter} from 'react-router-dom';
 import Alerts, { Config} from "../config/Config";
 import { v4 as uuidv4 } from 'uuid';
+
+/* Components */
 import Register from "./Register";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
+import Movielist from "./Movielist";
 
 class Home extends Component{
     constructor(){
@@ -26,7 +29,7 @@ class Home extends Component{
                    <div className="collapse navbar-collapse" id="navbarText">
                        <ul className="navbar-nav mr-auto">
                            <li className="nav-item">
-                               <Link className={"nav-link"} to={"/posts"}> Posts </Link>
+                               <Link className={"nav-link"} to={"/movielist"}> Movies </Link>
                            </li>                           
                        </ul>                       
                    </div>
@@ -43,13 +46,16 @@ class Home extends Component{
                </div>
                <Switch>            
                     <Route path="/register">
-                        <Register  setAlert={this.setAlert}/>
+                        <Register setAlert={this.setAlert}/>
                     </Route>
                     <Route path="/login">
-                        <Login  setAlert={this.setAlert}/>
+                        <Login setAlert={this.setAlert}/>
                     </Route>
                     <Route path="/dashboard">
-                        <Dashboard  setAlert={this.setAlert}/>
+                        <Dashboard setAlert={this.setAlert}/>
+                    </Route>
+                    <Route path="/movielist">
+                        <Movielist setAlert={this.setAlert}/>
                     </Route>
                </Switch>
            </div>
