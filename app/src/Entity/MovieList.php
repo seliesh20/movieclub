@@ -3,10 +3,23 @@
 namespace App\Entity;
 
 use App\Repository\MovieListRepository;
+use App\Annotation\Link;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
+
+
+/** 
  * @ORM\Entity(repositoryClass=MovieListRepository::class)
+ * @Serializer\ExclusionPolicy("all")
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *          "api_movie_show",
+ *          parameters={"movie_title" = "expr(object.getMovieTitle())"}
+ *      )
+ * )
  */
 class MovieList
 {
