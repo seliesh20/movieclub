@@ -13,13 +13,28 @@ class Home extends Component{
     constructor(){
         super();   
         this.state = {
-            alerts:{}
+            alerts:{},
+            user:(Config.USER_KEY != null)
         }      
-        this.setAlert = this.setAlert.bind(this);        
+        this.setAlert = this.setAlert.bind(this);
+        this.setUserKey = this.setUserKey.bind(this);        
+        this.unSetUserKey = this.unSetUserKey.bind(this);        
     }  
     setAlert(alertData){        
         this.setState({alerts:alertData});       
     }    
+    setUserKey(key){
+        Config.USER_KEY = key;
+        localStorage.setItem("user.key", key);
+        this.setState({user:true});
+    }
+    unSetUserKey(e){
+        e.preventDefault();
+        Config.USER_KEY = null;
+        localStorage.removeItem("user.key");
+        this.setState({user:false});
+    }
+    
     render() {
         let th = this;
         return (
@@ -29,13 +44,20 @@ class Home extends Component{
                    <div className="collapse navbar-collapse" id="navbarText">
                        <ul className="navbar-nav mr-auto">
                            <li className="nav-item">
-                               <Link className={"nav-link"} to={"/movielists"}> Movies </Link>
+                               
                            </li>                           
                        </ul>                       
                    </div>
-                   <Link className={"btn btn-primary"} to={"/register"}> Register </Link>
-                   &nbsp;&nbsp;
-                   <Link className={"btn btn-primary"} to={"/login"}> Login </Link>
+                   {this.state.user == false?(
+                       <div>
+                        <Link className={"btn btn-primary"} to={"/register"}> Register </Link>                    
+                        <Link className={"btn btn-primary"} to={"/login"}> Login </Link>
+                        </div>
+                    ):(
+                        <div>
+                        <Link className={"btn btn-primary"} to={"/logout"} onClick={this.unSetUserKey}> Logout </Link>
+                        </div>
+                    )}
                </nav>
                <div id="alertbox">                                             
                     {Object.keys(this.state.alerts).length === 0?(<br/>):(                                                
@@ -44,20 +66,28 @@ class Home extends Component{
                         })  
                     )}
                </div>
-               <Switch>            
-                    <Route path="/register">
-                        <Register setAlert={this.setAlert}/>
-                    </Route>
-                    <Route path="/login">
-                        <Login setAlert={this.setAlert}/>
-                    </Route>
+               {this.state.user == true?(
+                <Switch>
+                    <Redirect exact from="/" to="/dashboard" />
+                    <Redirect exact from="/login" to="/dashboard" />
                     <Route path="/dashboard">
                         <Dashboard setAlert={this.setAlert}/>
                     </Route>
                     <Route path="/movielists">
                         <Movielist setAlert={this.setAlert}/>
                     </Route>
-               </Switch>
+                </Switch>    
+               ):(
+                <Switch>
+                    <Redirect exact from="/dashboard" to="/login" />
+                    <Route path="/register">
+                        <Register setAlert={this.setAlert}/>
+                    </Route>
+                    <Route path="/login">                           
+                        <Login setAlert={this.setAlert} setUserKey={this.setUserKey}/>
+                    </Route>
+                </Switch>    
+               )}               
            </div>
         )
     }

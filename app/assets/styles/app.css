@@ -14,6 +14,13 @@ body {
 .box {
     position: relative;
 }
+.bottom-front {
+    position: absolute;
+    background: aquamarine;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
 .overlay>.fa {
     position: absolute;
     top: 50%;

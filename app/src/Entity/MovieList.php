@@ -15,7 +15,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "self",
  *      href=@Hateoas\Route(
- *          "expr('api/movies/' ~ object.getId())"
+ *          "expr('api_movies_lists' ~ object.getId())"
  *      )
  * )
  */

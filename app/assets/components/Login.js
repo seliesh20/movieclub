@@ -73,10 +73,10 @@ class Login extends Component{
                     data: {username:this.state.email, password:this.state.password},
                     headers:{'Content-Type':"application/json"}
                 });
-                if(response.status == 200){                    
-                    localStorage.setItem('user.key', response.data.token);
+                if(response.status == 200){                                        
+                    th.props.setUserKey(response.data.token);                    
                     document.querySelector('.overlay').className = 'overlay hide';
-                    window.location = Config.BASE_URL+'/dashboard';
+                    //window.location = Config.BASE_URL+'/dashboard';                    
                 }                  
             } catch(error){
                 if(typeof error.response != "undefined"){

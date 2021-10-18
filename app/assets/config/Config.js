@@ -8,6 +8,7 @@ String.prototype.capitalize = function() {
 export const Config = {
     BASE_URL:BASE_URL,
     EMAIL_REGREX:/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/,
+    USER_KEY:localStorage.getItem('user.key')
 }
 
 class Alerts extends Component{     
