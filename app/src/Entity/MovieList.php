@@ -20,8 +20,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      )
  * ) 
  * @ApiResource(
- *   normalizationContext={"groups"={"movie_list:read"}, "swagger_definition_name":"Read"},
- *   normalizationContext={"groups"={"movie_list:write"}, "swagger_definition_name":"Write"}
+ *   normalizationContext={"groups"={"movie_list:read"}, "swagger_definition_name":"Read"}
  * )
  * */
 class MovieList
@@ -35,33 +34,38 @@ class MovieList
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"movie_list:read"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"movie_list:read"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"movie_list:read"})
      */
     private $image_url;
 
     /**
      * @ORM\Column(type="string", length=15)
+     * @Groups({"movie_list:read"})
      */
     private $imdb_id;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="movieLists")
      * @ORM\JoinColumn(nullable=false) 
-     * @Groups({"movie_list:read", "movie_list:write"})
+     * @Groups({"movie_list:read"})
      */
     private $user;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"movie_list:read"})
      */
     private $post_time;
 

@@ -76,7 +76,7 @@ class Home extends Component{
                     <Route path="/dashboard">
                         <Dashboard 
                             setAlert={this.setAlert} 
-                            unSetUserKey={this.unSetUser}
+                            unSetUser={this.unSetUser}
                             />
                     </Route>
                     <Route path="/movielists">

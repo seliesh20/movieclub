@@ -14,7 +14,7 @@ class Dashboard extends Component{
             <div className="d-flex justify-content-center col-12">
                 <Movielist 
                     setAlert={this.props.setAlert}
-                    unSetUserKey={this.props.unSetUserKey}
+                    unSetUser={this.props.unSetUser}
                     />
                 <Meetings />
             </div>            

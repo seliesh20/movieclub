@@ -34,8 +34,7 @@ class Movielist extends Component{
         try{
             axios({
                 method:"get",
-                url: Config.BASE_URL + '/api/movie_lists',
-                data: {},
+                url: Config.BASE_URL + '/api/movie_lists',                
                 headers:{
                     'Accept':"application/hal+json",
                     'Authorization': 'Bearer '+ Config.USER_KEY
@@ -50,7 +49,7 @@ class Movielist extends Component{
                 }
             }).catch(error=>{
                 if(error.response.data.code == 401 && error.response.data.message == 'Expired JWT Token'){
-                    th.props.unSetUserKey();
+                    th.props.unSetUser();
                     th.props.setAlert({
                         0:{
                             type:"danger",
@@ -88,13 +87,21 @@ class Movielist extends Component{
         let th = this;
         return(<div className="col-md-6 col-lg-6 col-sm-12 box">            
             {this.state.isAdd?(
-                <MovielistAdd goBackMovesList={this.goBackMovesList}></MovielistAdd>
+                <MovielistAdd 
+                    goBackMovesList={this.goBackMovesList} 
+                    unSetUser={this.props.unSetUser}
+                    setAlert={this.props.setAlert}></MovielistAdd>
             ):(
                 <div>
                     <h4>MovieList <input type="button" className="btn btn-primary" onClick={this.handleAddMovieClick} value={'Add Movie'}/></h4>
                     {(Object.keys(this.state.movielists).length && this.state.movielists.totalItems > 0)?(
                         Object.keys(this.state.movielists._embedded.item).map(function(i) {                            
-                            return <MovieSingle key={uuidv4()} movie={th.state.movielists._embedded.item[i]} />
+                            return <MovieSingle 
+                                key={uuidv4()} 
+                                movie={th.state.movielists._embedded.item[i]} 
+                                unSetUser={th.props.unSetUser}
+                                setAlert={th.props.setAlert}
+                                />
                         })
                     ):null}                                    
                 </div>
@@ -117,7 +124,7 @@ class MovieSingle extends Component{
     }
     render(){
         return(<div className="d-flex col-4 box float-left">
-            <img src={this.props.movie.image_url} width="250px" height="330px"/>
+            <img src={this.props.movie.image_url} width="100%" height="160px"/>
             <span className="bottom-front"><b>{this.props.movie.title}{this.props.movie.description}</b></span>
         </div>)
     }
@@ -215,7 +222,9 @@ class MovielistAdd extends Component{
                                 return <MovieSearchSingle 
                                     key={uuidv4()} 
                                     goBackMovesList={th.props.goBackMovesList} 
-                                    movie={th.state.movieslist[i]} />
+                                    movie={th.state.movieslist[i]} 
+                                    setAlert={th.props.setAlert}
+                                    unSetUser={th.props.unSetUser}/>
                             })
                         ):null}
                     </div>
@@ -233,62 +242,116 @@ class MovielistAdd extends Component{
  class MovieSearchSingle extends Component{
     constructor(props){
         super(props)
-        console.log(props)
         this.handleAddMovie = this.handleAddMovie.bind(this);
+        this.checkAdded = this.checkAdded.bind(this);
+        this.state = {
+            showAdd:false
+        }
+        this.checkAdded();
+    }
+    checkAdded(){
+        let th = this;
+        let formData = new FormData();
+        formData.append('imdbId', this.props.movie.id);
+        axios({
+            method: "post",
+            url: Config.BASE_URL + '/api/check_movie',
+            data:formData,
+            headers:{
+                'Content-Type':"application/json",
+                'Authorization': 'Bearer '+ Config.USER_KEY
+            }
+        }).then(response => {
+            if(response.status == 200 && response.data.status == 'success'){
+                th.setState({
+                    showAdd:true
+                })
+            }
+        }).catch(error=>{
+            if(error.response.data.code == 401 && error.response.data.message == 'Expired JWT Token'){
+                th.props.unSetUser();
+                th.props.setAlert({
+                    0:{
+                        type:"danger",
+                        message:"Session Expired!!"
+                    }
+                });                    
+            } else {
+                th.props.setAlert({
+                    0:{
+                        type:"danger",
+                        message:error.response.data.message
+                    }
+                });
+                this.setState({
+                    movielists:{}
+                })                
+            }
+        });
     }
     handleAddMovie(event){
         event.preventDefault();
-        document.querySelector('.overlay').classList.remove('hide');
-        try{
-            let th = this;
-            axios({
-                method:"post",
-                    url: Config.BASE_URL + '/api/movie_lists',
-                    data: {
-                        title:th.props.movie.title,
-                        description:th.props.movie.description,
-                        imageUrl:th.props.movie.image,
-                        imdbId:th.props.movie.id,
-                        postTime: "2021-10-19 09:13:44",
-                        user:"test@email.com"
-                    },
-                    headers:{
-                        'Accept':"application/hal+json",
-                        'Authorization': 'Bearer '+ Config.USER_KEY
+        let th = this;
+        document.querySelector('.overlay').classList.remove('hide');        
+        let now = new Date();
+        let now_utc = new Date(now.toUTCString().slice(0, -4));
+        axios({
+            method: "post",
+            url: Config.BASE_URL + '/api/movie_lists',
+            data: {
+                title: th.props.movie.title,
+                description: th.props.movie.description,
+                imageUrl: th.props.movie.image,
+                imdbId: th.props.movie.id,
+                postTime: now_utc,
+                user: "/api/users/" + Config.USER_ID
+            },
+            headers: {
+                'Accept': "application/hal+json",
+                'Authorization': 'Bearer ' + Config.USER_KEY
+            }
+        }).then(response => {
+            if (response.status == 201) {
+                th.props.setAlert({
+                    0: {
+                        type: "success",
+                        message: "Movie " + th.props.movie.title + " Added!!"
                     }
-            }).then(response => {
-                if(response.status == 200){
-                    th.props.setAlert({
-                        0: {
-                            type: "success",
-                            message: "Movie "+h.props.movie.title+" Added!!"
-                        }
-                    });
-                    this.props.goBackMovesList();
-                }
-            }).catch(error => {
+                });
+                th.props.goBackMovesList();
+                document.querySelector('.overlay').classList.add('hide');
+            }
+        }).catch(error => {
+            console.log(error);
+            if (error.response.data.code == 401 && error.response.data.message == 'Expired JWT Token') {
+                th.props.unSetUser();
+                th.props.setAlert({
+                    0: {
+                        type: "danger",
+                        message: "Session Expired!!"
+                    }
+                });
+            } else {
                 th.props.setAlert({
                     0: {
                         type: "danger",
                         message: error.response.data.message
                     }
                 });
+                this.setState({
+                    movielists: {}
+                })
                 document.querySelector('.overlay').classList.add('hide');
-            })
-        } catch(error){
-            th.props.setAlert({
-                0: {
-                    type: "danger",
-                    message: error.response.data.message
-                }
-            });
-            document.querySelector('.overlay').classList.add('hide');
-        }        
+            }
+        })
+              
     }
     render(){
         return(<div className="d-flex col-4 box float-left">
-            <img src={this.props.movie.image} width="250px" height="330px"/>
-            <Link to="/" onClick={this.handleAddMovie} className="top-add-button btn btn-success"><i className="fa fa-plus"></i> Add</Link>
+            <img src={this.props.movie.image} width="100%" height="160px"/>
+            {this.state.showAdd?(
+                <Link to="/" onClick={this.handleAddMovie} className="top-add-button btn btn-success"><i className="fa fa-plus"></i> Add</Link>
+            ):null}            
             <span className="bottom-front"><b>{this.props.movie.title}{this.props.movie.description}</b></span>
         </div>)
     }

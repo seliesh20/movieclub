@@ -21,8 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="`user`")
  * @UniqueEntity("email")
  * @ApiResource(
- *     normalizationContext={"groups"={"user:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"user:write"}, "swagger_definition_name"="Write"}
+ *     normalizationContext={"groups"={"user:read"}, "swagger_definition_name"="Read"} 
  * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -31,8 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups("user:read")
-     * @ApiProperty(iri="https://schema.org/identifier", identifier=true)
+     * @Groups({"user:read"})
      */
     private $id;
 
@@ -40,13 +38,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank     
      * @Assert\Email    
-     * @Groups("user:read")    
+     * @Groups({"user:read"})   
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")  
-     * @Groups("user:read"})    
      */
     private $roles = [];
 
@@ -54,14 +51,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")     
      * @Assert\Length(min=8)
-     * @Groups("user:read")
+     * @Groups({"user:write"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank  
-     * @Groups("user:read")   
+     * @Groups({"user:read"})
      */
     private $name;
 

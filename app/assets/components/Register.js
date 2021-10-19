@@ -42,44 +42,47 @@ class Register extends Component{
         let th = this;
         //save
         if(this.state.is_valid()){
-            document.querySelector('.overlay').className = 'overlay';
-            var bodyFormData = new FormData();
-            bodyFormData.append('name', this.state.name);
-            bodyFormData.append('email', this.state.email);
-            bodyFormData.append('password', this.state.password);
+            document.querySelector('.overlay').className = 'overlay';            
             try{
                 const response = await axios({
                     method:"post",
-                    url: Config.BASE_URL + '/api/register',
-                    data: bodyFormData,
-                    headers:{'Content-Type':"multipart/form-data"}
+                    url: Config.BASE_URL + '/api/users',
+                    data: {
+                        name: this.state.name,
+                        email: this.state.email,
+                        password: this.state.password
+                    },
+                    headers: {
+                        'Accept': "application/hal+json"                        
+                    }                    
                 });
-                if(response.status == 200){                    
-                    if(response.data.status === "success"){
-                        //show success message                                
-                        var username = <strong>{this.state.name}</strong>;
-                        th.props.setAlert({
-                            0:{
-                                type:"success",
-                                message:<span>The user {username} is registered successfully!!</span>
-                            }
-                        });
-                        window.location = Config.BASE_URL + '/login';
-                    } else {
-                        Object.keys(response.data.result.errors).forEach(function(key, i){
-                            th.showError(document.querySelector('input[name='+key+']'), response.data.result.errors[key].join('<br/>'));                            
-                        });
-                    }
-                    document.querySelector('.overlay').className = 'overlay hide';
+                if (response.status == 201) {
+                    //show success message                                
+                    var username = <strong>{this.state.name}</strong>;
+                    th.props.setAlert({
+                        0: {
+                            type: "success",
+                            message: <span>The user {username} is registered successfully!!</span>
+                        }
+                    });
+                    window.location = Config.BASE_URL + '/login';
+                    document.querySelector('.overlay').classList.add('hide');
                 }
-            } catch( error){
-                //show error
-                th.props.setAlert({
-                    0:{
-                        type:"danger",
-                        message:"An internal error occured!!"                            
-                    }
-                });
+            } catch( error){                
+                if(error.message == "Request failed with status code 422"){
+                    error.response.data.violations.map((v, i)=>{  
+                        th.showError(document.querySelector('input[name='+v.propertyPath+']'), v.message);
+                    })   
+                } else {
+                    //show error
+                    th.props.setAlert({
+                        0:{
+                            type:"danger",
+                            message:"An internal error occured!!"                            
+                        }
+                    });
+                }                
+                document.querySelector('.overlay').classList.add('hide');
             }            
         }
     }
