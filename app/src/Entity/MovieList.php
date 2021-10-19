@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MovieListRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
@@ -17,9 +18,12 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      href=@Hateoas\Route(
  *          "expr('api_movies_lists' ~ object.getId())"
  *      )
+ * ) 
+ * @ApiResource(
+ *   normalizationContext={"groups"={"movie_list:read"}, "swagger_definition_name":"Read"},
+ *   normalizationContext={"groups"={"movie_list:write"}, "swagger_definition_name":"Write"}
  * )
- */
-#[ApiResource]
+ * */
 class MovieList
 {
     /**
@@ -51,7 +55,8 @@ class MovieList
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="movieLists")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false) 
+     * @Groups({"movie_list:read", "movie_list:write"})
      */
     private $user;
 

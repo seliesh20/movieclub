@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Security;
 
 
 use App\Entity\User;
@@ -51,5 +52,11 @@ class UserController extends AbstractController
         //save
         $userRepository->save($user);
         return new JsonResponse(['status'=>'success', 'result'=>['email'=>$email]]);
+    }
+
+    #[Route('/api/user', name: 'user_get', methods:["post"])]
+    public function getUserDetails(Request $request, Security $security): Response {
+        $user = $security->getUser();
+        return new JsonResponse(['status'=>'success', 'result'=>['id'=> $user->getId()]]);
     }
 }

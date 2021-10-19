@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -17,6 +20,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  * @UniqueEntity("email")
+ * @ApiResource(
+ *     normalizationContext={"groups"={"user:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"user:write"}, "swagger_definition_name"="Write"}
+ * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -24,18 +31,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user:read")
+     * @ApiProperty(iri="https://schema.org/identifier", identifier=true)
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank     
-     * @Assert\Email        
+     * @Assert\Email    
+     * @Groups("user:read")    
      */
     private $email;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json")  
+     * @Groups("user:read"})    
      */
     private $roles = [];
 
@@ -43,17 +54,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")     
      * @Assert\Length(min=8)
+     * @Groups("user:read")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank     
+     * @Assert\NotBlank  
+     * @Groups("user:read")   
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity=MovieList::class, mappedBy="user")
+     * @Groups("user:read")
      */
     private $movieLists;
 

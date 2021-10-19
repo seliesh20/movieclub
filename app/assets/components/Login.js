@@ -18,6 +18,7 @@ class Login extends Component{
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
+        this.setUser = this.setUser.bind(this);
     }
     showError(input, message){
         let value = input.value.trim();        
@@ -74,7 +75,8 @@ class Login extends Component{
                     headers:{'Content-Type':"application/json"}
                 });
                 if(response.status == 200){                                        
-                    th.props.setUserKey(response.data.token);                    
+                    th.props.setUser('USER_KEY', response.data.token);
+                    th.setUser();
                     document.querySelector('.overlay').className = 'overlay hide';
                     //window.location = Config.BASE_URL+'/dashboard';                    
                 }                  
@@ -89,6 +91,36 @@ class Login extends Component{
                     document.querySelector('.overlay').className = 'overlay hide';
                 }                
             }
+        }
+    }
+    setUser(){
+        try{
+            let th = this;
+            document.querySelector('.overlay').classList.remove('hide');
+            axios({
+                method:"post",
+                url: Config.BASE_URL + '/api/user',                
+                headers:{
+                    'Content-Type':"application/json",
+                    'Authorization': 'Bearer '+ Config.USER_KEY
+                }
+            }).then(response => {
+                if(response.status == 200){                                        
+                    //Setting ID
+                    th.props.setUser('USER_ID', response.data.result.id);                              
+                    document.querySelector('.overlay').classList.add('hide');
+                }
+            });
+        } catch(error){
+            if(typeof error.response != "undefined"){
+                th.props.setAlert({
+                    0:{
+                        type:"danger",
+                        message:error.response.data.message
+                    }
+                });
+                document.querySelector('.overlay').className = 'overlay hide';
+            }                
         }
     }
     render(){

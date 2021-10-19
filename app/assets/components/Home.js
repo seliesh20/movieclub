@@ -17,21 +17,24 @@ class Home extends Component{
             user:(Config.USER_KEY != null)
         }      
         this.setAlert = this.setAlert.bind(this);
-        this.setUserKey = this.setUserKey.bind(this);        
-        this.unSetUserKey = this.unSetUserKey.bind(this);        
+        this.setUser = this.setUser.bind(this);        
+        this.unSetUser = this.unSetUser.bind(this);        
     }  
     setAlert(alertData){        
         this.setState({alerts:alertData});       
     }    
-    setUserKey(key){
-        Config.USER_KEY = key;
-        localStorage.setItem("user.key", key);
+    setUser(key, value){
+        Config[key] = value;
+        localStorage.setItem("user."+key, value);
         this.setState({user:true});
     }
-    unSetUserKey(e){
-        e.preventDefault();
+    unSetUser(e){        
+        if(typeof e != "undefined")
+            e.preventDefault();
         Config.USER_KEY = null;
-        localStorage.removeItem("user.key");
+        Config.USER_ID = null;
+        localStorage.removeItem("user.USER_KEY");
+        localStorage.removeItem("user.USER_ID");
         this.setState({user:false});
     }
     
@@ -55,7 +58,7 @@ class Home extends Component{
                         </div>
                     ):(
                         <div>
-                        <Link className={"btn btn-primary"} to={"/logout"} onClick={this.unSetUserKey}> Logout </Link>
+                        <Link className={"btn btn-primary"} to={"/logout"} onClick={this.unSetUser}> Logout </Link>
                         </div>
                     )}
                </nav>
@@ -71,7 +74,10 @@ class Home extends Component{
                     <Redirect exact from="/" to="/dashboard" />
                     <Redirect exact from="/login" to="/dashboard" />
                     <Route path="/dashboard">
-                        <Dashboard setAlert={this.setAlert}/>
+                        <Dashboard 
+                            setAlert={this.setAlert} 
+                            unSetUserKey={this.unSetUser}
+                            />
                     </Route>
                     <Route path="/movielists">
                         <Movielist setAlert={this.setAlert}/>
@@ -84,7 +90,7 @@ class Home extends Component{
                         <Register setAlert={this.setAlert}/>
                     </Route>
                     <Route path="/login">                           
-                        <Login setAlert={this.setAlert} setUserKey={this.setUserKey}/>
+                        <Login setAlert={this.setAlert} setUser={this.setUser}/>
                     </Route>
                 </Switch>    
                )}               

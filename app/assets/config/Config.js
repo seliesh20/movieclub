@@ -8,7 +8,9 @@ String.prototype.capitalize = function() {
 export const Config = {
     BASE_URL:BASE_URL,
     EMAIL_REGREX:/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/,
-    USER_KEY:localStorage.getItem('user.key')
+    USER_KEY:localStorage.getItem('user.USER_KEY'),
+    USER_ID:localStorage.getItem('user.USER_ID'),
+    IMDB_URL:IMDB_URL
 }
 
 class Alerts extends Component{     
@@ -18,6 +20,7 @@ class Alerts extends Component{
             display:true
         };
         this.hideMessage = this.hideMessage.bind(this);
+        setTimeout(this.hideMessage, 500);
     }
     hideMessage(){
         this.setState({display:false});
