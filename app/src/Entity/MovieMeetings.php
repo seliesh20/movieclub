@@ -20,7 +20,7 @@ class MovieMeetings
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $title;
+    private $meeting_title;
 
     /**
      * @ORM\Column(type="date")
@@ -47,14 +47,14 @@ class MovieMeetings
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getMeetingTitle(): ?string
     {
-        return $this->title;
+        return $this->meeting_title;
     }
 
-    public function setTitle(string $title): self
+    public function setMeetingTitle(string $meeting_title): self
     {
-        $this->title = $title;
+        $this->meeting_title = $meeting_title;
 
         return $this;
     }
