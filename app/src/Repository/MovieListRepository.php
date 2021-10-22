@@ -18,14 +18,14 @@ class MovieListRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MovieList::class);
     }
-
+    
     public function findRandomUnSeenMovie()
     {
         $this->createQueryBuilder('ml')
-            ->select('ml')            
-            ->leftJoin('ml.move_list',  'movie_list')
-            ->where("ml.MovieMeeting", null)
-            ->orderBy('RAND()')
+            //->select('ml')
+            //->Join('mm.movie_list', 'ml')
+            ->where("ml.id not in (select distinct movie_list_id from MovieMeetings where movie_list_id is not null)")
+            //->orderBy('RAND()')
             ->getQuery()
             ->getResult();
     }

@@ -91,7 +91,7 @@ class Home extends Component{
                     </Route>
                     <Route path="/login">                           
                         <Login setAlert={this.setAlert} setUser={this.setUser}/>
-                    </Route>
+                    </Route>                    
                 </Switch>    
                )}               
            </div>

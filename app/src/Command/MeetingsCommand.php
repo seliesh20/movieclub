@@ -14,7 +14,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-use App\Service\ContainerParametersHelper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
@@ -67,24 +66,36 @@ class MeetingsCommand extends Command
         if($daysofweek > $todaysdayofweek){            
             $diff = ($daysofweek - $todaysdayofweek);
             $schedule_date->modify("+".$diff." day");
-            $io->note($schedule_date->format("Y-m-dTH:i:s.uZ"));        
+            //$io->note($schedule_date->format("Y-m-dTH:i:s.uZ"));        
 
-            $meetings = $this->movieMeetingRepository->findAll();
+            $meetings = $this->movieMeetingRepository->findBy([
+                'meeting_date' => $schedule_date
+            ]);
 
-            $movie = $this->movieListRepository->findAll();
+            $in = $this->movieMeetingRepository->createQueryBuilder('mm')
+                ->select("IDENTITY(mm.movie_list)")->getQuery()->getDQL();
+            $movie = $this->movieListRepository->createQueryBuilder('ml')
+                ->where($this->movieMeetingRepository->createQueryBuilder('')->expr()->notIn('ml.id', $in))
+                ->orderBy('RAND()')
+                ->setMaxResults(1)
+                ->getQuery()->getOneOrNullResult();
 
-            /*if(!(is_array($meetings) && count($meetings))){ 
+            if(is_array($meetings) && !count($meetings)){ 
+                $io->note("Starting to schedule Current Week Meeting!!");
                 $meeting = new MovieMeetings();
                 $meeting->setMeetingTitle('MovieClub Meeting!!-'.$schedule_date->format('W, Y'));
                 $meeting->setMeetingDate($schedule_date);
                 $meeting->setMeetingTime($schedule_date);
                 $meeting->setMovieList($movie); //random movie
-            }*/
-            $io->note(json_encode($meetings));
-            $io->note(json_encode($movie));            
+                $meeting->setStatus(1); //random movie
+                $this->movieMeetingRepository->save($meeting);
+                $io->note("Current Week Meeting scheduled!!");
+            } else {
+                $io->note("Current Week Meeting already scheduled!!");
+            }
         } 
         
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('Completed the schedule');
 
         return Command::SUCCESS;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MovieMeetingsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +43,21 @@ class MovieMeetings
      * @ORM\OneToOne(targetEntity=MovieList::class, cascade={"persist", "remove"})
      */
     private $movie_list;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=MovieMeetingEmail::class, inversedBy="movie_meetings")
+     */
+    private $movieMeetingEmail;
+
+    /**
+     * @ORM\OneToMany(targetEntity=MovieMeetingEmail::class, mappedBy="movie_meetings")
+     */
+    private $movieMeetingEmails;
+
+    public function __construct()
+    {
+        $this->movieMeetingEmails = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,4 +123,34 @@ class MovieMeetings
 
         return $this;
     }
+
+    /**
+     * @return Collection|MovieMeetingEmail[]
+     */
+    public function getMovieMeetingEmails(): Collection
+    {
+        return $this->movieMeetingEmails;
+    }
+
+    public function addMovieMeetingEmail(MovieMeetingEmail $movieMeetingEmail): self
+    {
+        if (!$this->movieMeetingEmails->contains($movieMeetingEmail)) {
+            $this->movieMeetingEmails[] = $movieMeetingEmail;
+            $movieMeetingEmail->setMovieMeetings($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovieMeetingEmail(MovieMeetingEmail $movieMeetingEmail): self
+    {
+        if ($this->movieMeetingEmails->removeElement($movieMeetingEmail)) {
+            // set the owning side to null (unless already changed)
+            if ($movieMeetingEmail->getMovieMeetings() === $this) {
+                $movieMeetingEmail->setMovieMeetings(null);
+            }
+        }
+
+        return $this;
+    }    
 }

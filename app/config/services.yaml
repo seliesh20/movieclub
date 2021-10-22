@@ -6,6 +6,8 @@
 parameters:
     app.meeting_week_day: '%env(MEETING_WEEK_DAY)%' 
     app.meeting_week_day_time: '%env(MEETING_WEEK_DAY_TIME)%' 
+    app.host: '%env(APP_URL)%'
+    app.encrypt_key: '%env(APP_SECRET)%'    
 services:
     # default configuration for services in *this* file
     _defaults:

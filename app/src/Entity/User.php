@@ -68,9 +68,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $movieLists;
 
+    /**
+     * @ORM\OneToMany(targetEntity=MovieMeetingEmail::class, mappedBy="user")
+     */
+    private $movieMeetingEmails;
+
     public function __construct()
     {
         $this->movieLists = new ArrayCollection();
+        $this->movieMeetingEmails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -197,6 +203,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($movieList->getUser() === $this) {
                 $movieList->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|MovieMeetingEmail[]
+     */
+    public function getMovieMeetingEmails(): Collection
+    {
+        return $this->movieMeetingEmails;
+    }
+
+    public function addMovieMeetingEmail(MovieMeetingEmail $movieMeetingEmail): self
+    {
+        if (!$this->movieMeetingEmails->contains($movieMeetingEmail)) {
+            $this->movieMeetingEmails[] = $movieMeetingEmail;
+            $movieMeetingEmail->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovieMeetingEmail(MovieMeetingEmail $movieMeetingEmail): self
+    {
+        if ($this->movieMeetingEmails->removeElement($movieMeetingEmail)) {
+            // set the owning side to null (unless already changed)
+            if ($movieMeetingEmail->getUser() === $this) {
+                $movieMeetingEmail->setUser(null);
             }
         }
 

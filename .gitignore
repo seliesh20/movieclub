@@ -46,3 +46,6 @@
 /app/yarn.lock
 /app/composer.lock
 /app/.env
+
+/app/tmp
+!/app/tmp/.gitignore

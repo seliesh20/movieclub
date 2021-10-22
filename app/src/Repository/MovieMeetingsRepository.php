@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\MovieMeetings;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
  * @method MovieMeetings|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,6 +19,16 @@ class MovieMeetingsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MovieMeetings::class);
     }
+
+    public function save($movieMeetings)
+    {
+        if (!$movieMeetings instanceof MovieMeetings) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($movieMeetings)));
+        }
+        $this->_em->persist($movieMeetings);
+        $this->_em->flush();
+    }
+    
 
     // /**
     //  * @return MovieMeetings[] Returns an array of MovieMeetings objects
